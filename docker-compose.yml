@@ -11,8 +11,15 @@ services:
       PYTHONDONTWRITEBYTECODE: "1"
       PYTHONPATH: /app/src
     working_dir: /app
-    command: ["python", "main.py"]
+    command:
+      [
+        "sh",
+        "-c",
+        "python main.py && uvicorn app:app --host 0.0.0.0 --port 8000",
+      ]
     volumes:
       - .:/app
+    ports:
+      - "8000:8000"
     mem_limit: 256m
     cpus: 0.50

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import json
 import logging
 import os
@@ -95,9 +93,13 @@ def _log_breakdown(normalized_hands: list[NormalizedHand]) -> None:
         return {str(k): v for k, v in counter.items()}
 
     logger.info("spots: %s", _str_keys(Counter(h.spot for h in normalized_hands)))
-    logger.info("formations: %s", _str_keys(Counter(h.formation for h in normalized_hands)))
+    logger.info(
+        "formations: %s", _str_keys(Counter(h.formation for h in normalized_hands))
+    )
     logger.info("roles: %s", _str_keys(Counter(h.hero_role for h in normalized_hands)))
-    logger.info("top lines: %s", dict(Counter(h.line for h in normalized_hands).most_common(10)))
+    logger.info(
+        "top lines: %s", dict(Counter(h.line for h in normalized_hands).most_common(10))
+    )
 
 
 if __name__ == "__main__":

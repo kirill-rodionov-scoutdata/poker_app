@@ -1,21 +1,18 @@
-.PHONY: start stop logs mike-foreman mike-lint
+.PHONY: start lint tests coverage
 
-# Run the full AUA Poker app with one command.
+# Run in Docker: first batch script, then web server.
 start:
 	docker compose up --build --remove-orphans
 
-# Stop and clean up containers.
-stop:
-	docker compose down
+# Lint and format the whole project with Ruff.
+lint:
+	uv run ruff format .
+	uv run ruff check . --fix
 
-# Stream container logs.
-logs:
-	docker compose logs -f aua-poker
+# Run tests.
+tests:
+	uv run pytest -q
 
-# Mike Foreman: quick compose health/config check.
-mike-foreman:
-	docker compose config --quiet
-
-# Mike Lint: lightweight syntax/lint pass inside container.
-mike-lint:
-	docker compose run --rm aua-poker python -m compileall -q src main.py
+# Run tests with coverage report.
+coverage:
+	uv run pytest --cov=src/poker --cov-report=term-missing --cov-report=xml

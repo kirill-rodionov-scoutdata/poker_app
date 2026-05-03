@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import re
 
 HAND_HEADER = re.compile(
@@ -22,9 +20,7 @@ ACTION_COLON = re.compile(
     r"^(.+?): (folds|checks|calls|bets|raises)"
     r"(?:\s+\$([0-9.]+))?(?:\s+to\s+\$([0-9.]+))?"
 )
-SUMMARY_POSITION = re.compile(
-    r"^Seat \d+: (.+?) \((small blind|big blind|button)\)"
-)
+SUMMARY_POSITION = re.compile(r"^Seat \d+: (.+?) \((small blind|big blind|button)\)")
 SKIP_LINE = re.compile(
     r"^(Main pot|Total pot|Uncalled bet|Dealt to|Board \[|Rake|"
     r".*collected|.*doesn't show|.*does not show|.*did not show|"

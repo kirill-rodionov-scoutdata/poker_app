@@ -8,6 +8,9 @@ version = "0.1.0"
 requires-python = ">=3.11"
 dependencies = [
     "python-dotenv>=1.0.0",
+    "fastapi>=0.115.0",
+    "uvicorn>=0.30.0",
+    "ruff>=0.15.12",
 ]
 
 [tool.setuptools.packages.find]
@@ -16,4 +19,5 @@ where = ["src"]
 [dependency-groups]
 dev = [
     "pytest>=9.0.3",
+    "pytest-cov>=6.0.0",
 ]

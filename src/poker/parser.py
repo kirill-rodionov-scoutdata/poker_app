@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import re
 from pathlib import Path
 
@@ -48,7 +46,6 @@ _SUMMARY_LABEL_TO_POSITION: dict[str, PlayerPosition] = {
 
 
 class HandParser:
-
     def parse_file(self, path: Path, source: Source) -> list[ParsedHand]:
         text = path.read_text(encoding="utf-8", errors="replace")
         results: list[ParsedHand] = []
@@ -101,12 +98,19 @@ class HandParser:
             return None
         actions, board = self._collect_actions_and_board(lines, P.ACTION_COLON)
         players = self._build_players(
-            seat_to_player, seat_to_stack, button_seat,
-            self._extract_summary_positions(lines), fmt,
+            seat_to_player,
+            seat_to_stack,
+            button_seat,
+            self._extract_summary_positions(lines),
+            fmt,
         )
         return ParsedHand(
-            hand_id=hand_id, source=source, button_seat=button_seat,
-            players=players, actions=actions, board=board,
+            hand_id=hand_id,
+            source=source,
+            button_seat=button_seat,
+            players=players,
+            actions=actions,
+            board=board,
         )
 
     def _parse_nocolon_format(
@@ -128,12 +132,19 @@ class HandParser:
             lines, action_pattern, strip_all_in=True
         )
         players = self._build_players(
-            seat_to_player, seat_to_stack, button_seat,
-            self._extract_summary_positions(lines), "wpn_his",
+            seat_to_player,
+            seat_to_stack,
+            button_seat,
+            self._extract_summary_positions(lines),
+            "wpn_his",
         )
         return ParsedHand(
-            hand_id=hand_id, source=source, button_seat=button_seat,
-            players=players, actions=actions, board=board,
+            hand_id=hand_id,
+            source=source,
+            button_seat=button_seat,
+            players=players,
+            actions=actions,
+            board=board,
         )
 
     def _collect_actions_and_board(
@@ -177,12 +188,14 @@ class HandParser:
             if action_match:
                 verb = action_match.group(2)
                 amount_raw = action_match.group(4) or action_match.group(3)
-                actions.append(Action(
-                    street=current_street,
-                    player=action_match.group(1),
-                    action=_VERB_TO_ACTION[verb],
-                    amount=float(amount_raw) if amount_raw else None,
-                ))
+                actions.append(
+                    Action(
+                        street=current_street,
+                        player=action_match.group(1),
+                        action=_VERB_TO_ACTION[verb],
+                        amount=float(amount_raw) if amount_raw else None,
+                    )
+                )
 
         return actions, board
 
@@ -255,12 +268,16 @@ class HandParser:
             name = seat_to_player[seat_number]
             stack = seat_to_stack.get(seat_number, 0.0)
             if fmt == "gto":
-                position: PlayerPosition | None = _GTO_NAME_TO_POSITION.get(name.upper())
+                position: PlayerPosition | None = _GTO_NAME_TO_POSITION.get(
+                    name.upper()
+                )
             elif name in summary_positions:
                 position = summary_positions[name]
             else:
                 offset = (seat_numbers.index(seat_number) - button_index) % total_seats
                 position = _SEAT_OFFSET_TO_POSITION.get(offset)
-            players.append(Player(name=name, seat=seat_number, position=position, stack=stack))
+            players.append(
+                Player(name=name, seat=seat_number, position=position, stack=stack)
+            )
 
         return players

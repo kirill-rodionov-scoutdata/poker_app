@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import logging
 
 from poker.models import NormalizedHand, Source, SourceResult, StatResult, StatStatus
@@ -64,7 +62,9 @@ class StatAggregator:
         value = round(numerator / denominator, 4)
 
         if denominator < min_sample:
-            return SourceResult(value=value, sample=denominator, status=StatStatus.LOW_SAMPLE)
+            return SourceResult(
+                value=value, sample=denominator, status=StatStatus.LOW_SAMPLE
+            )
 
         return SourceResult(value=value, sample=denominator, status=StatStatus.OK)
 
@@ -74,5 +74,8 @@ class StatAggregator:
         if numerator > denominator:
             logger.error(
                 "sanity check failed stat=%s source=%s numerator=%d > denominator=%d",
-                stat_id, source, numerator, denominator,
+                stat_id,
+                source,
+                numerator,
+                denominator,
             )

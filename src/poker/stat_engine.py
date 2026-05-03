@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from poker.models import (
     ActionType,
     Formation,
@@ -66,10 +64,14 @@ class StatComputer:
         ok, spot_filter = _map_or_none(context_filters.get("spot"), _SPOT_MAP)
         if not ok:
             return 0, 0
-        ok, formation_filter = _map_or_none(context_filters.get("formation"), _FORMATION_MAP)
+        ok, formation_filter = _map_or_none(
+            context_filters.get("formation"), _FORMATION_MAP
+        )
         if not ok:
             return 0, 0
-        ok, position_filter = _map_or_none(context_filters.get("position"), _POSITION_MAP)
+        ok, position_filter = _map_or_none(
+            context_filters.get("position"), _POSITION_MAP
+        )
         if not ok:
             return 0, 0
         ok, role_filter = _map_or_none(context_filters.get("role"), _ROLE_MAP)
@@ -85,10 +87,15 @@ class StatComputer:
             return 0, 0
         opportunity_can_act = opportunity.get("canAct")
 
-        ok, facing_action_filter = _map_or_none(opportunity.get("facingAction"), _ACTION_MAP)
+        ok, facing_action_filter = _map_or_none(
+            opportunity.get("facingAction"), _ACTION_MAP
+        )
         if not ok:
             return 0, 0
-        use_facing = "facingAction" in opportunity and opportunity.get("facingAction") is not None
+        use_facing = (
+            "facingAction" in opportunity
+            and opportunity.get("facingAction") is not None
+        )
 
         success = stat.get("success", {})
         ok, success_street = _map_or_none(success.get("street"), _STREET_MAP)
@@ -136,7 +143,10 @@ class StatComputer:
                         continue
 
             if "maxActionIndex" in opportunity:
-                if hand.action_index is not None and hand.action_index > opportunity["maxActionIndex"]:
+                if (
+                    hand.action_index is not None
+                    and hand.action_index > opportunity["maxActionIndex"]
+                ):
                     continue
 
             denominator += 1
@@ -166,7 +176,9 @@ def compute_stat(
     return StatComputer().compute(stat, hands)
 
 
-def _map_or_none(value: str | None, mapping: dict[str, object]) -> tuple[bool, object | None]:
+def _map_or_none(
+    value: str | None, mapping: dict[str, object]
+) -> tuple[bool, object | None]:
     if value is None:
         return True, None
     mapped = mapping.get(value)

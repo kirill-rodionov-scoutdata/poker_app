@@ -1,7 +1,6 @@
 # Project specific ignores
 Test base/
 DATA_README.txt
-stat_catalog.json
 task.txt
 
 # Python standard ignores

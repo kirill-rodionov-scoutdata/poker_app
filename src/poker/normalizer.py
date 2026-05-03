@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from poker.models import (
     Action,
     ActionType,
@@ -23,7 +21,6 @@ _ACTION_TO_LINE_CODE: dict[ActionType, str] = {
 
 
 class HandNormalizer:
-
     def normalize(self, parsed_hand: ParsedHand) -> list[NormalizedHand]:
         big_blind_name = self._find_big_blind_name(parsed_hand)
         if big_blind_name is None:
@@ -51,11 +48,16 @@ class HandNormalizer:
         hero_role = self._detect_hero_role(preflop_actions, big_blind_name)
 
         big_blind_flop_actions = [a for a in flop_actions if a.player == big_blind_name]
-        hero_indices = [i for i, a in enumerate(flop_actions) if a.player == big_blind_name]
-        can_act = len(hero_indices) > 0 or any(a.player != big_blind_name for a in flop_actions)
+        hero_indices = [
+            i for i, a in enumerate(flop_actions) if a.player == big_blind_name
+        ]
+        can_act = len(hero_indices) > 0 or any(
+            a.player != big_blind_name for a in flop_actions
+        )
 
-        first_action = big_blind_flop_actions[0].action if big_blind_flop_actions else None
-        hero_action = big_blind_flop_actions[-1].action if big_blind_flop_actions else None
+        hero_first_action = (
+            big_blind_flop_actions[0].action if big_blind_flop_actions else None
+        )
         action_count = len(big_blind_flop_actions)
 
         action_index = None
@@ -67,18 +69,27 @@ class HandNormalizer:
         # BB_BTN: BB acts first postflop → BB is OOP, BTN is IP
         # BB_SB:  SB acts first postflop → BB is IP,  SB is OOP
         bb_position = (
-            PostflopPosition.OOP if formation == Formation.BB_BTN else PostflopPosition.IP
+            PostflopPosition.OOP
+            if formation == Formation.BB_BTN
+            else PostflopPosition.IP
         )
         opponent_position = (
-            PostflopPosition.IP if formation == Formation.BB_BTN else PostflopPosition.OOP
+            PostflopPosition.IP
+            if formation == Formation.BB_BTN
+            else PostflopPosition.OOP
         )
 
         opponent_flop_actions = [a for a in flop_actions if a.player == opponent_name]
-        opponent_indices = [i for i, a in enumerate(flop_actions) if a.player == opponent_name]
-        opponent_can_act = len(opponent_indices) > 0 or any(a.player != opponent_name for a in flop_actions)
+        opponent_indices = [
+            i for i, a in enumerate(flop_actions) if a.player == opponent_name
+        ]
+        opponent_can_act = len(opponent_indices) > 0 or any(
+            a.player != opponent_name for a in flop_actions
+        )
 
-        opponent_first_action = opponent_flop_actions[0].action if opponent_flop_actions else None
-        opponent_action = opponent_flop_actions[-1].action if opponent_flop_actions else None
+        opponent_first_action = (
+            opponent_flop_actions[0].action if opponent_flop_actions else None
+        )
         opponent_action_count = len(opponent_flop_actions)
 
         opponent_action_index = None
@@ -88,8 +99,12 @@ class HandNormalizer:
                 break
         opponent_role = self._detect_hero_role(preflop_actions, opponent_name)
 
-        bb_facing_action, bb_depth = self._get_facing_action(big_blind_name, opponent_name, flop_actions)
-        opponent_facing_action, opponent_depth = self._get_facing_action(opponent_name, big_blind_name, flop_actions)
+        bb_facing_action, bb_depth = self._get_facing_action(
+            big_blind_name, opponent_name, flop_actions
+        )
+        opponent_facing_action, opponent_depth = self._get_facing_action(
+            opponent_name, big_blind_name, flop_actions
+        )
 
         if can_act and action_index is None:
             # inconsistent: игрок должен был действовать, но не найдено действие
@@ -110,9 +125,9 @@ class HandNormalizer:
                 street=Street.FLOP,
                 line=self._encode_line(big_blind_flop_actions),
                 can_act=can_act,
-                action=hero_action,
+                action=hero_first_action,
                 facing_action=bb_facing_action,
-                first_action=first_action,
+                first_action=hero_first_action,
                 action_index=action_index,
                 action_count=action_count,
                 facing_depth=bb_depth,
@@ -127,7 +142,7 @@ class HandNormalizer:
                 street=Street.FLOP,
                 line=self._encode_line(opponent_flop_actions),
                 can_act=opponent_can_act,
-                action=opponent_action,
+                action=opponent_first_action,
                 facing_action=opponent_facing_action,
                 first_action=opponent_first_action,
                 action_index=opponent_action_index,
@@ -198,13 +213,15 @@ class HandNormalizer:
         if hero_first_index is None:
             return None, 0
 
+        last_opponent_action = None
         depth = 0
+
         for action in flop_actions[:hero_first_index]:
             if action.player == opponent_name:
+                last_opponent_action = action.action
                 depth += 1
-                return action.action, depth
 
-        return None, depth
+        return last_opponent_action, depth
 
     def _encode_line(self, actions: list[Action]) -> str:
         return "".join(

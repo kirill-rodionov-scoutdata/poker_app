@@ -1,0 +1,267 @@
+:root {
+  color-scheme: light dark;
+
+  --bg: #f5f6f8;
+  --surface: #ffffff;
+  --surface-alt: #f8fafc;
+  --surface-debug: #f1f5f9;
+
+  --text: #0f172a;
+  --text-muted: #64748b;
+  --text-soft: #94a3b8;
+  --accent: #2563eb;
+
+  --border: #dbe3ed;
+  --border-strong: #c7d2e2;
+
+  --row-alt: #fafcff;
+  --row-hover: #eef4ff;
+  --no-data-bg: #f3f4f6;
+
+  --positive: #15803d;
+  --negative: #b91c1c;
+  --neutral: #6b7280;
+  --low-sample: #b45309;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f131a;
+    --surface: #151b24;
+    --surface-alt: #1a2230;
+    --surface-debug: #1b2432;
+
+    --text: #e5e7eb;
+    --text-muted: #9ca3af;
+    --text-soft: #94a3b8;
+    --accent: #60a5fa;
+
+    --border: #293245;
+    --border-strong: #334155;
+
+    --row-alt: #131a26;
+    --row-hover: #1a2435;
+    --no-data-bg: #1d2432;
+
+    --positive: #4ade80;
+    --negative: #f87171;
+    --neutral: #9ca3af;
+    --low-sample: #f59e0b;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  line-height: 1.5;
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 24px 16px 40px;
+}
+
+h1 {
+  margin: 0 0 20px;
+  font-size: clamp(1.75rem, 1.4rem + 1.2vw, 2.3rem);
+  line-height: 1.2;
+  font-weight: 800;
+  color: var(--accent);
+}
+
+.table-wrap {
+  overflow-x: auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.stats-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.stats-table th,
+.stats-table td {
+  width: 25%;
+  padding: 12px 10px;
+  border-bottom: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+  text-align: center;
+  vertical-align: middle;
+}
+
+.stats-table th:last-child,
+.stats-table td:last-child {
+  border-right: 0;
+}
+
+.stats-table thead th {
+  background: var(--surface-alt);
+  font-weight: 700;
+}
+
+.stats-table tbody tr:nth-child(even) {
+  background: var(--row-alt);
+}
+
+.stats-table tbody tr:hover {
+  background: var(--row-hover);
+}
+
+.stat-value {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-weight: 700;
+}
+
+.sample {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.delta {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-weight: 700;
+}
+
+.delta.positive {
+  color: var(--positive);
+}
+
+.delta.negative {
+  color: var(--negative);
+}
+
+.delta.neutral {
+  color: var(--neutral);
+}
+
+.no-data {
+  color: var(--neutral);
+  font-style: italic;
+  background: var(--no-data-bg);
+}
+
+.null-value {
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.low-sample td:first-child {
+  border-left: 4px solid var(--low-sample);
+}
+
+.low-sample .sample,
+.low-sample .stat-value {
+  color: var(--low-sample);
+}
+
+.debug {
+  margin-top: 22px;
+  padding: 14px 16px;
+  border: 1px solid var(--border-strong);
+  background: var(--surface-debug);
+}
+
+.debug h2 {
+  margin: 0 0 10px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.debug-block h3 {
+  margin: 0 0 8px;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.denom-list {
+  margin: 0;
+  font-size: 0.83rem;
+  color: var(--text-muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 700px) {
+  .container {
+    padding: 16px 12px 28px;
+  }
+
+  .stats-table,
+  .stats-table thead,
+  .stats-table tbody,
+  .stats-table tr,
+  .stats-table th,
+  .stats-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .stats-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+  }
+
+  .stats-table tbody tr {
+    margin-bottom: 10px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+  }
+
+  .stats-table td {
+    border: 0;
+    border-bottom: 1px solid var(--border);
+    text-align: right;
+    padding: 10px 12px;
+  }
+
+  .stats-table td:last-child {
+    border-bottom: 0;
+  }
+
+  .stats-table td::before {
+    content: attr(data-label);
+    float: left;
+    color: var(--text-muted);
+    font-weight: 600;
+  }
+
+  .stats-table tr td:nth-child(1)::before {
+    content: "Stat";
+  }
+
+  .stats-table tr td:nth-child(2)::before {
+    content: "Pop";
+  }
+
+  .stats-table tr td:nth-child(3)::before {
+    content: "GTO";
+  }
+
+  .stats-table tr td:nth-child(4)::before {
+    content: "Delta";
+  }
+
+  .stats-table .null-value {
+    text-align: left;
+  }
+
+  .stats-table .null-value::before {
+    content: "Result";
+  }
+}

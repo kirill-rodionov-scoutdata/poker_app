@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mini Poker Stats Explorer</title>
+    <link rel="stylesheet" href="/static/explorer.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Poker Stats Explorer</h1>
+
+      <div class="table-wrap" role="region" aria-label="Stats table" tabindex="0">
+        <table class="stats-table">
+          <thead>
+            <tr>
+              <th>Stat</th>
+              <th>Pop</th>
+              <th>GTO</th>
+              <th>Delta</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Flop bet frequency</td>
+              <td><span class="stat-value">0.6619</span> <span class="sample">(139)</span></td>
+              <td><span class="stat-value">0.4649</span> <span class="sample">(4046)</span></td>
+              <td class="delta positive">+0.197</td>
+            </tr>
+
+            <tr class="low-sample">
+              <td>3BP flop bet frequency</td>
+              <td><span class="stat-value">0.6786</span> <span class="sample">(28)</span></td>
+              <td><span class="stat-value">0.6283</span> <span class="sample">(799)</span></td>
+              <td class="delta positive">+0.0503</td>
+            </tr>
+
+            <tr>
+              <td>3BP flop check frequency</td>
+              <td><span class="stat-value">0.2857</span> <span class="sample">(28)</span></td>
+              <td><span class="stat-value">0.3479</span> <span class="sample">(799)</span></td>
+              <td class="delta negative">-0.0622</td>
+            </tr>
+
+            <tr class="no-data">
+              <td>Triple barrel frequency</td>
+              <td colspan="3" class="null-value">No data (0)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <section class="debug" aria-label="Debug details">
+        <h2>Debug</h2>
+        <div class="debug-block">
+          <details open>
+            <summary><b>cbet_frequency</b></summary>
+            <div title="denom — руки, попавшие в знаменатель (возможность совершить действие)">
+              <b>Population возможность:</b>
+              <div class="hand-id-list">
+                177493352, 177497332, 177499119, 177504002,
+                177508115, 177509777, 177510244
+              </div>
+            </div>
+          </details>
+        </div>
+      </section>
+    </div>
+  </body>
+</html>
