@@ -91,6 +91,9 @@ class NormalizedHand:
     line: str
     can_act: bool
     action: ActionType | None
+    facing_action: ActionType | None
+    first_action: ActionType | None
+    action_index: int | None
 
 
 class StatStatus(StrEnum):

@@ -51,8 +51,16 @@ class HandNormalizer:
         hero_role = self._detect_hero_role(preflop_actions, big_blind_name)
 
         big_blind_flop_actions = [a for a in flop_actions if a.player == big_blind_name]
-        can_act = bool(big_blind_flop_actions)
-        hero_action = big_blind_flop_actions[-1].action if can_act else None
+        can_act = any(a.player == big_blind_name for a in flop_actions)
+
+        first_action = big_blind_flop_actions[0].action if big_blind_flop_actions else None
+        hero_action = big_blind_flop_actions[-1].action if big_blind_flop_actions else None
+
+        action_index = None
+        for i, a in enumerate(flop_actions):
+            if a.player == big_blind_name:
+                action_index = i
+                break
 
         # BB_BTN: BB acts first postflop → BB is OOP, BTN is IP
         # BB_SB:  SB acts first postflop → BB is IP,  SB is OOP
@@ -64,9 +72,28 @@ class HandNormalizer:
         )
 
         opponent_flop_actions = [a for a in flop_actions if a.player == opponent_name]
-        opponent_can_act = bool(opponent_flop_actions)
-        opponent_action = opponent_flop_actions[-1].action if opponent_can_act else None
+        opponent_can_act = any(a.player == opponent_name for a in flop_actions)
+
+        opponent_first_action = opponent_flop_actions[0].action if opponent_flop_actions else None
+        opponent_action = opponent_flop_actions[-1].action if opponent_flop_actions else None
+
+        opponent_action_index = None
+        for i, a in enumerate(flop_actions):
+            if a.player == opponent_name:
+                opponent_action_index = i
+                break
         opponent_role = self._detect_hero_role(preflop_actions, opponent_name)
+
+        bb_facing_action = self._get_facing_action(big_blind_name, opponent_name, flop_actions)
+        opponent_facing_action = self._get_facing_action(opponent_name, big_blind_name, flop_actions)
+
+        if can_act and action_index is None:
+            # inconsistent: игрок должен был действовать, но не найдено действие
+            return []
+
+        if opponent_can_act and opponent_action_index is None:
+            # inconsistent: игрок должен был действовать, но не найдено действие
+            return []
 
         return [
             NormalizedHand(
@@ -80,6 +107,9 @@ class HandNormalizer:
                 line=self._encode_line(big_blind_flop_actions),
                 can_act=can_act,
                 action=hero_action,
+                facing_action=bb_facing_action,
+                first_action=first_action,
+                action_index=action_index,
             ),
             NormalizedHand(
                 hand_id=parsed_hand.hand_id,
@@ -92,6 +122,9 @@ class HandNormalizer:
                 line=self._encode_line(opponent_flop_actions),
                 can_act=opponent_can_act,
                 action=opponent_action,
+                facing_action=opponent_facing_action,
+                first_action=opponent_first_action,
+                action_index=opponent_action_index,
             ),
         ]
 
@@ -118,12 +151,6 @@ class HandNormalizer:
             if action.action == ActionType.FOLD:
                 active.discard(action.player)
 
-        flop_actions = [a for a in parsed_hand.actions if a.street == Street.FLOP]
-
-        for action in flop_actions:
-            if action.action == ActionType.FOLD:
-                active.discard(action.player)
-
         return active
 
     def _detect_formation(
@@ -146,6 +173,28 @@ class HandNormalizer:
         if preflop_raises and preflop_raises[-1].player == big_blind_name:
             return HeroRole.PFR
         return HeroRole.PFC
+
+    def _get_facing_action(
+        self,
+        hero_name: str,
+        opponent_name: str,
+        flop_actions: list[Action],
+    ) -> ActionType | None:
+        hero_first_index = None
+
+        for i, action in enumerate(flop_actions):
+            if action.player == hero_name:
+                hero_first_index = i
+                break
+
+        if hero_first_index is None:
+            return None
+
+        for action in flop_actions[:hero_first_index]:
+            if action.player == opponent_name:
+                return action.action
+
+        return None
 
     def _encode_line(self, actions: list[Action]) -> str:
         return "".join(

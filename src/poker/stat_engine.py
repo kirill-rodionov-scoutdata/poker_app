@@ -85,6 +85,11 @@ class StatComputer:
             return 0, 0
         opportunity_can_act = opportunity.get("canAct")
 
+        ok, facing_action_filter = _map_or_none(opportunity.get("facingAction"), _ACTION_MAP)
+        if not ok:
+            return 0, 0
+        use_facing = "facingAction" in opportunity and opportunity.get("facingAction") is not None
+
         success = stat.get("success", {})
         ok, success_street = _map_or_none(success.get("street"), _STREET_MAP)
         if not ok:
@@ -97,6 +102,9 @@ class StatComputer:
         denominator = 0
 
         for hand in hands:
+            if hand.can_act and hand.action is None:
+                continue
+
             if spot_filter is not None and hand.spot != spot_filter:
                 continue
             if formation_filter is not None and hand.formation != formation_filter:
@@ -108,17 +116,27 @@ class StatComputer:
             if street_filter is not None and hand.street != street_filter:
                 continue
 
-            if opportunity_street is not None and hand.street != opportunity_street:
-                continue
-            if opportunity_can_act is not None and hand.can_act != opportunity_can_act:
-                continue
+            if opportunity_street is not None and opportunity_street != Street.FLOP:
+                return 0, 0
+
+            if use_facing:
+                if hand.facing_action != facing_action_filter:
+                    continue
+            else:
+                if opportunity_can_act is not None and hand.can_act != opportunity_can_act:
+                    continue
 
             denominator += 1
 
-            if success_street is not None and hand.street != success_street:
-                continue
-            if success_action is not None and hand.action != success_action:
-                continue
+            if success_street is not None and success_street != Street.FLOP:
+                return 0, 0
+            if success_action is not None:
+                if "useFirstAction" in success and success.get("useFirstAction"):
+                    if hand.first_action != success_action:
+                        continue
+                else:
+                    if hand.action != success_action:
+                        continue
 
             numerator += 1
 
