@@ -98,11 +98,17 @@ class StatComputer:
         if not ok:
             return 0, 0
 
+        if opportunity_street is not None and opportunity_street != Street.FLOP:
+            return 0, 0
+
+        if success_street is not None and success_street != Street.FLOP:
+            return 0, 0
+
         numerator = 0
         denominator = 0
 
         for hand in hands:
-            if hand.can_act and hand.action is None:
+            if hand.can_act and hand.action is None and hand.first_action is None:
                 continue
 
             if spot_filter is not None and hand.spot != spot_filter:
@@ -116,22 +122,31 @@ class StatComputer:
             if street_filter is not None and hand.street != street_filter:
                 continue
 
-            if opportunity_street is not None and opportunity_street != Street.FLOP:
-                return 0, 0
-
             if use_facing:
                 if hand.facing_action != facing_action_filter:
                     continue
+
+                # depth-aware фильтр (если есть)
+                if "maxFacingDepth" in opportunity:
+                    if hand.action_count > opportunity["maxFacingDepth"]:
+                        continue
             else:
-                if opportunity_can_act is not None and hand.can_act != opportunity_can_act:
+                if opportunity_can_act is not None:
+                    if hand.can_act != opportunity_can_act:
+                        continue
+
+            if "maxActionIndex" in opportunity:
+                if hand.action_index is not None and hand.action_index > opportunity["maxActionIndex"]:
                     continue
 
             denominator += 1
 
-            if success_street is not None and success_street != Street.FLOP:
-                return 0, 0
             if success_action is not None:
                 if "useFirstAction" in success and success.get("useFirstAction"):
+                    if hand.first_action != success_action:
+                        continue
+                elif "useFirstAction" not in success and hand.action_count > 1:
+                    # если много действий, используем first_action по умолчанию
                     if hand.first_action != success_action:
                         continue
                 else:

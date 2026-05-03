@@ -94,6 +94,8 @@ class NormalizedHand:
     facing_action: ActionType | None
     first_action: ActionType | None
     action_index: int | None
+    action_count: int
+    facing_depth: int
 
 
 class StatStatus(StrEnum):
