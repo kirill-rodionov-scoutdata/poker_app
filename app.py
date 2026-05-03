@@ -240,24 +240,25 @@ let selectedStatId = null;
 function formationLabel(formation) {
   if (formation === "BB_BTN") return "BB vs BTN";
   if (formation === "BB_SB") return "BB vs SB";
+  if (formation === "ALL") return "ALL";
   return "-";
 }
 
 function statStructure(contextFilters) {
-  const spot = contextFilters?.spot || "-";
+  const spot = contextFilters?.spot || "ALL";
   const formation = formationLabel(contextFilters?.formation || "");
-  const position = contextFilters?.position || "-";
-  const role = contextFilters?.role || "-";
+  const position = contextFilters?.position || "ALL";
+  const role = contextFilters?.role || "ALL";
   return `[${spot} | ${formation} | ${position} | ${role}]`;
 }
 
-function statContext(stat) {
+function statContext(stat, activeFilters) {
   const ctx = stat.contextFilters || {};
   const merged = {
-    spot: ctx.spot || stat.spot || "-",
-    formation: ctx.formation || stat.formation || "",
-    position: ctx.position || stat.position || "-",
-    role: ctx.role || stat.role || "-",
+    spot: ctx.spot || stat.spot || activeFilters.spot || "ALL",
+    formation: ctx.formation || stat.formation || activeFilters.formation || "ALL",
+    position: ctx.position || stat.position || activeFilters.position || "ALL",
+    role: ctx.role || stat.role || activeFilters.role || "ALL",
   };
   return statStructure(merged);
 }
@@ -307,6 +308,7 @@ function loadStats() {
   const formation = document.getElementById("formation").value;
   const position = document.getElementById("position").value;
   const role = document.getElementById("role").value;
+  const activeFilters = { spot, formation, position, role };
 
   fetch(`/stats?spot=${spot}&formation=${formation}&position=${position}&role=${role}`)
     .then(r => r.json())
@@ -330,7 +332,7 @@ function loadStats() {
         row.innerHTML = `
           <td title="${escapeAttr(tooltipText(s))}">
             <div><b>${s.label}</b></div>
-            <div class="sample">${statContext(s)}</div>
+            <div class="sample">${statContext(s, activeFilters)}</div>
           </td>
           <td>${formatStat(s.population.value, popNum, s.population.sample)}</td>
           <td>${formatStat(s.gto.value, gtoNum, s.gto.sample)}</td>
